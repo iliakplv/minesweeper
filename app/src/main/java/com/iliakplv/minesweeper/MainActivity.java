@@ -34,8 +34,8 @@ public class MainActivity extends Activity {
 		gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				final int clickedRow = position / 8;
-				final int clickedCol = position % 8;
+				final int clickedRow = position / HEIGHT;
+				final int clickedCol = position % WIDTH;
 
 				final boolean fieldChanged =
 						game.pickCell(clickedRow, clickedCol);
