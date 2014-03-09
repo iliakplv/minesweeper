@@ -282,6 +282,8 @@ public class MinesweeperGame {
 		// game over states
 		GameOverPickedMine,
 		GameOverUnpickedMine
+		// TODO add GameOverFlaggedMine
+		// TODO add GameOverFlaggedNumber
 	}
 
 	public static class Cell {
