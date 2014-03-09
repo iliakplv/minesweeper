@@ -102,9 +102,7 @@ public class MinesweeperGame {
 				if (minesMatrix[row][col].state == CellState.UnpickedNumber) {
 					int minesCount = 0;
 					for (Pair<Integer, Integer> cell : getAdjacentCells(row, col)) {
-						if (minesMatrix[cell.first][cell.second].state == CellState.UnpickedMine ||
-								minesMatrix[cell.first][cell.second].state == CellState.FlaggedMine ||
-								minesMatrix[cell.first][cell.second].state == CellState.QuestionMine) {
+						if (minesMatrix[cell.first][cell.second].isMine()) {
 							minesCount++;
 						}
 					}
@@ -233,6 +231,7 @@ public class MinesweeperGame {
 			for (int col = 0; col < fieldWidth; col++) {
 				if (minesMatrix[row][col].state == CellState.UnpickedMine ||
 						minesMatrix[row][col].state == CellState.QuestionMine) {
+					// flagged mines not changing
 					minesMatrix[row][col].state = CellState.GameOverUnpickedMine;
 				}
 			}
@@ -292,6 +291,26 @@ public class MinesweeperGame {
 		public Cell(CellState state, int numberOfAdjacentMines) {
 			this.state = state;
 			this.numberOfAdjacentMines = numberOfAdjacentMines;
+		}
+
+		public boolean isMine() {
+			switch (state) {
+				case UnpickedMine:
+				case FlaggedMine:
+				case QuestionMine:
+				case GameOverUnpickedMine:
+				case GameOverPickedMine:
+					return true;
+
+				case UnpickedNumber:
+				case FlaggedNumber:
+				case QuestionNumber:
+				case PickedNumber:
+					return false;
+
+				default:
+					throw new RuntimeException("Unknown cell state: " + state.toString());
+			}
 		}
 
 		public CellState getState() {
