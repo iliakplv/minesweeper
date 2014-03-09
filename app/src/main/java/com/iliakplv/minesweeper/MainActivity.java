@@ -12,7 +12,7 @@ public class MainActivity extends Activity {
 
 	private static final int HEIGHT = 8;
 	private static final int WIDTH = 8;
-	private static final int MINES = 10;
+	private static final int MINES = 8;
 
 	String[] fieldArray = new String[HEIGHT * WIDTH];
 	GridView gridView;
