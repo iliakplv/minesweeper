@@ -1,6 +1,7 @@
 package com.iliakplv.minesweeper;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,10 +45,15 @@ public class MainActivity extends Activity {
 					updateFieldArray(game.getMinesField());
 					adapter.notifyDataSetChanged();
 
-					if (game.isWin()) {
-						((TextView) findViewById(R.id.message)).setText("You won! :)");
-					} else if (game.isLose()) {
-						((TextView) findViewById(R.id.message)).setText("You lost! :(");
+					if (game.isGameOver()) {
+						final TextView message = (TextView) findViewById(R.id.message);
+						if (game.isWin()) {
+							message.setText("You won! :)");
+							message.setTextColor(Color.GREEN);
+						} else if (game.isLose()) {
+							message.setText("You lost! :(");
+							message.setTextColor(Color.RED);
+						}
 					}
 				}
 			}
