@@ -67,12 +67,12 @@ public class MinesweeperGame {
 			for (int col = 0; col < fieldWidth; col++) {
 				final int newRow = random.nextInt(fieldHeight);
 				final int newCol = random.nextInt(fieldWidth);
-				swapValues(row, col, newRow, newCol);
+				swapCells(row, col, newRow, newCol);
 			}
 		}
 	}
 
-	private void swapValues(int row1, int col1, int row2, int col2) {
+	private void swapCells(int row1, int col1, int row2, int col2) {
 		Cell temp = minesMatrix[row1][col1];
 		minesMatrix[row1][col1] = minesMatrix[row2][col2];
 		minesMatrix[row2][col2] = temp;
@@ -102,7 +102,9 @@ public class MinesweeperGame {
 				if (minesMatrix[row][col].state == CellState.UnpickedNumber) {
 					int minesCount = 0;
 					for (Pair<Integer, Integer> cell : getAdjacentCells(row, col)) {
-						if (minesMatrix[cell.first][cell.second].state == CellState.UnpickedMine) {
+						if (minesMatrix[cell.first][cell.second].state == CellState.UnpickedMine ||
+								minesMatrix[cell.first][cell.second].state == CellState.FlaggedMine ||
+								minesMatrix[cell.first][cell.second].state == CellState.QuestionMine) {
 							minesCount++;
 						}
 					}
@@ -125,6 +127,43 @@ public class MinesweeperGame {
 	}
 
 	/**
+	 * Set/Clear Flag or Question on cell
+	 *
+	 * @return {@code true} if something changed on mines field
+	 */
+	public boolean markCell(int row, int col) {
+		if (isGameOver()) {
+			return false;
+		}
+		checkCoordinates(row, col);
+
+		boolean changed = false;
+		final Cell cell = minesMatrix[row][col];
+		if (cell.state == CellState.UnpickedNumber) { // flag
+			cell.state = CellState.FlaggedNumber;
+			changed = true;
+		} else if (cell.state == CellState.UnpickedMine) { // flag
+			cell.state = CellState.FlaggedMine;
+			changed = true;
+		} else if (cell.state == CellState.FlaggedNumber) { // question
+			cell.state = CellState.QuestionNumber;
+			changed = true;
+		} else if (cell.state == CellState.FlaggedMine) { // question
+			cell.state = CellState.QuestionMine;
+			changed = true;
+		} else if (cell.state == CellState.QuestionNumber) { // clear
+			cell.state = CellState.UnpickedNumber;
+			changed = true;
+		} else if (cell.state == CellState.QuestionMine) { // clear
+			cell.state = CellState.UnpickedMine;
+			changed = true;
+		}
+
+		return changed;
+	}
+
+
+	/**
 	 * Pick cell on mines field
 	 *
 	 * @param pickedRow
@@ -135,27 +174,31 @@ public class MinesweeperGame {
 		if (isGameOver()) {
 			return false;
 		}
+		checkCoordinates(pickedRow, pickedCol);
+
+		final Cell pickedCell = minesMatrix[pickedRow][pickedCol];
+		if (pickedCell.state == CellState.UnpickedNumber ||
+				pickedCell.state == CellState.UnpickedMine) {
+
+			if (pickedCell.state == CellState.UnpickedMine) {
+				onMinePicked(pickedRow, pickedCol);
+			} else {
+				onNumberPicked(pickedRow, pickedCol);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private void checkCoordinates(int pickedRow, int pickedCol) {
 		if (pickedRow < 0 || pickedRow >= fieldHeight) {
 			throw new IllegalArgumentException("Wrong row number: " + pickedRow);
 		}
 		if (pickedCol < 0 || pickedCol >= fieldWidth) {
 			throw new IllegalArgumentException("Wrong column number: " + pickedCol);
 		}
-		final Cell pickedCell = minesMatrix[pickedRow][pickedCol];
-		if (pickedCell.state == CellState.PickedNumber) {
-			return false;
-		}
-
-		if (pickedCell.state == CellState.UnpickedMine) {
-			onMinePicked(pickedRow, pickedCol);
-		} else if (pickedCell.state == CellState.UnpickedNumber) {
-			onNumberPicked(pickedRow, pickedCol);
-		} else {
-			throw new RuntimeException("Wrong cell picked: (" + pickedRow + ", " + pickedCol + ") "
-					+ pickedCell.state.toString());
-		}
-
-		return true;
 	}
 
 	private void onNumberPicked(int pickedRow, int pickedCol) {
@@ -188,7 +231,8 @@ public class MinesweeperGame {
 	private void showUnpickedMines() {
 		for (int row = 0; row < fieldHeight; row++) {
 			for (int col = 0; col < fieldWidth; col++) {
-				if (minesMatrix[row][col].state == CellState.UnpickedMine) {
+				if (minesMatrix[row][col].state == CellState.UnpickedMine ||
+						minesMatrix[row][col].state == CellState.QuestionMine) {
 					minesMatrix[row][col].state = CellState.GameOverUnpickedMine;
 				}
 			}
@@ -225,9 +269,18 @@ public class MinesweeperGame {
 	 */
 
 	public static enum CellState {
+		// initial states
 		UnpickedNumber,
 		UnpickedMine,
+
+		// in-game states
+		FlaggedNumber,
+		FlaggedMine,
+		QuestionNumber,
+		QuestionMine,
 		PickedNumber,
+
+		// game over states
 		GameOverPickedMine,
 		GameOverUnpickedMine
 	}

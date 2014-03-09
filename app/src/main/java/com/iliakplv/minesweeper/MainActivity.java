@@ -8,12 +8,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
 	private static final int HEIGHT = 8;
 	private static final int WIDTH = 8;
-	private static final int MINES = 8;
+	private static final int MINES = 10;
 
 	String[] fieldArray = new String[HEIGHT * WIDTH];
 	GridView gridView;
@@ -25,13 +26,25 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 
+		findViewById(R.id.reset_button).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				resetGame();
+				Toast.makeText(MainActivity.this, "New game started", Toast.LENGTH_SHORT).show();
+			}
+		});
+		resetGame();
+	}
+
+	private void resetGame() {
+		((TextView) findViewById(R.id.message)).setText("");
+
 		final MinesweeperGame game = new MinesweeperGame(WIDTH, HEIGHT, MINES);
 		updateFieldArray(game.getMinesField());
 
 		adapter = new ArrayAdapter<String>(this, R.layout.cell, R.id.label, fieldArray);
 		gridView = (GridView) findViewById(R.id.field);
 		gridView.setAdapter(adapter);
-
 		gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -58,6 +71,19 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+		gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				final int clickedRow = position / HEIGHT;
+				final int clickedCol = position % WIDTH;
+
+				game.markCell(clickedRow, clickedCol);
+				updateFieldArray(game.getMinesField());
+				adapter.notifyDataSetChanged();
+
+				return true;
+			}
+		});
 	}
 
 
@@ -77,8 +103,19 @@ public class MainActivity extends Activity {
 							label = String.valueOf(numberOfAdjacentMines);
 						}
 						break;
+
+					case FlaggedNumber:
+					case FlaggedMine:
+						label = "!";
+						break;
+
+					case QuestionNumber:
+					case QuestionMine:
+						label = "?";
+						break;
+
 					case GameOverPickedMine:
-						label = "(!)";
+						label = "(*)";
 						break;
 					case GameOverUnpickedMine:
 						label = "*";
