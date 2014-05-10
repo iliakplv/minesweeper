@@ -125,7 +125,7 @@ public class MinesweeperGame {
 	}
 
 	/**
-	 * Set/Clear Flag or Question on cell
+	 * Set/Clear Flag on cell
 	 *
 	 * @return {@code true} if something changed on mines field
 	 */
