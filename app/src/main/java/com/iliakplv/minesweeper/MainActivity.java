@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
 
 	private static final int HEIGHT = 8;
 	private static final int WIDTH = 8;
-	private static final int MINES = 10;
+	private static final int MINES = 8;
 
 	String[] fieldArray = new String[HEIGHT * WIDTH];
 	GridView gridView;
@@ -108,19 +108,21 @@ public class MainActivity extends Activity {
 
 					case FlaggedNumber:
 					case FlaggedMine:
-						label = "!";
+						label = "(?)";
 						break;
 
-					case QuestionNumber:
-					case QuestionMine:
-						label = "?";
-						break;
 
 					case GameOverPickedMine:
-						label = "(*)";
+						label = "!*!";
 						break;
 					case GameOverUnpickedMine:
 						label = "*";
+						break;
+					case GameOverFlaggedMine:
+						label = "(*)";
+						break;
+					case GameOverFlaggedNumber:
+						label = "( )";
 						break;
 				}
 				fieldArray[arrayIndex] = label;

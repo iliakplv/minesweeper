@@ -143,16 +143,10 @@ public class MinesweeperGame {
 		} else if (cell.state == CellState.UnpickedMine) { // flag
 			cell.state = CellState.FlaggedMine;
 			changed = true;
-		} else if (cell.state == CellState.FlaggedNumber) { // question
-			cell.state = CellState.QuestionNumber;
-			changed = true;
-		} else if (cell.state == CellState.FlaggedMine) { // question
-			cell.state = CellState.QuestionMine;
-			changed = true;
-		} else if (cell.state == CellState.QuestionNumber) { // clear
+		} else if (cell.state == CellState.FlaggedNumber) { // clear flag
 			cell.state = CellState.UnpickedNumber;
 			changed = true;
-		} else if (cell.state == CellState.QuestionMine) { // clear
+		} else if (cell.state == CellState.FlaggedMine) { // clear flag
 			cell.state = CellState.UnpickedMine;
 			changed = true;
 		}
@@ -216,23 +210,25 @@ public class MinesweeperGame {
 		unpickedNumbers--;
 		if (unpickedNumbers == 0) {
 			setWin();
-			showUnpickedMines();
+			setCellStatesToGameOver();
 		}
 	}
 
 	private void onMinePicked(int pickedRow, int pickedCol) {
 		minesMatrix[pickedRow][pickedCol].state = CellState.GameOverPickedMine;
 		setLose();
-		showUnpickedMines();
+		setCellStatesToGameOver();
 	}
 
-	private void showUnpickedMines() {
+	private void setCellStatesToGameOver() {
 		for (int row = 0; row < fieldHeight; row++) {
 			for (int col = 0; col < fieldWidth; col++) {
-				if (minesMatrix[row][col].state == CellState.UnpickedMine ||
-						minesMatrix[row][col].state == CellState.QuestionMine) {
-					// flagged mines not changing
+				if (minesMatrix[row][col].state == CellState.UnpickedMine) {
 					minesMatrix[row][col].state = CellState.GameOverUnpickedMine;
+				} else if (minesMatrix[row][col].state == CellState.FlaggedMine) {
+					minesMatrix[row][col].state = CellState.GameOverFlaggedMine;
+				} else if (minesMatrix[row][col].state == CellState.FlaggedNumber) {
+					minesMatrix[row][col].state = CellState.GameOverFlaggedNumber;
 				}
 			}
 		}
@@ -275,15 +271,13 @@ public class MinesweeperGame {
 		// in-game states
 		FlaggedNumber,
 		FlaggedMine,
-		QuestionNumber,
-		QuestionMine,
 		PickedNumber,
 
 		// game over states
 		GameOverPickedMine,
-		GameOverUnpickedMine
-		// TODO add GameOverFlaggedMine
-		// TODO add GameOverFlaggedNumber
+		GameOverUnpickedMine,
+		GameOverFlaggedMine,
+		GameOverFlaggedNumber
 	}
 
 	public static class Cell {
@@ -299,15 +293,15 @@ public class MinesweeperGame {
 			switch (state) {
 				case UnpickedMine:
 				case FlaggedMine:
-				case QuestionMine:
 				case GameOverUnpickedMine:
 				case GameOverPickedMine:
+				case GameOverFlaggedMine:
 					return true;
 
 				case UnpickedNumber:
 				case FlaggedNumber:
-				case QuestionNumber:
 				case PickedNumber:
+				case GameOverFlaggedNumber:
 					return false;
 
 				default:

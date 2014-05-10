@@ -12,6 +12,7 @@
 		android:gravity="center"
 		android:minHeight="40dp"
 		android:textSize="20sp"
+		android:lines="1"
 		android:background="#cccccccc"
 		android:text="0">
 	</TextView>
