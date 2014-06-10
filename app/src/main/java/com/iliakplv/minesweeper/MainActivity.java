@@ -63,10 +63,10 @@ public class MainActivity extends Activity {
 					if (game.isGameOver()) {
 						final TextView message = (TextView) findViewById(R.id.message);
 						if (game.isWin()) {
-							message.setText("You won! :)");
+							message.setText("Win :)");
 							message.setTextColor(Color.GREEN);
 						} else if (game.isLose()) {
-							message.setText("You lost! :(");
+							message.setText("Lose :(");
 							message.setTextColor(Color.RED);
 						}
 					}
